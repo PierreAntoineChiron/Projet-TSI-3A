@@ -45,7 +45,7 @@ class ViewerGL:
         
         self.i_frame_on = True
         self.hit = False
-        self.pdv = 20
+        self.pdv = 10
 
     def run(self):
         # boucle d'affichage
@@ -53,25 +53,23 @@ class ViewerGL:
             # nettoyage de la fenêtre : fond et profondeur
             GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
 
-            self.update_key()
+            self.finito_pipo()
 
-           # if self.lakitu_init == 0:
-            #    self.objs[10].transformation.translation += \
-           #         pyrr.matrix33.apply_to_vector(pyrr.matrix33.create_from_eulers(self.objs[10].transformation.rotation_euler), pyrr.Vector3([0, -60,-5]))
-           #     self.lakitu_init = 1
+            if self.unalive != 3:
+                self.update_key()
 
-            if self.unalive !=2:
-                self.gravity()
-                self.mvt_carapace()
+                if self.unalive !=2:
+                    self.gravity()
+                    self.mvt_carapace()
 
-                if self.unalive == 0:
-                    self.collision_sol()
-                    self.saut()
-                    self.collision_kirb_carap()
+                    if self.unalive == 0:
+                        self.collision_sol()
+                        self.saut()
+                        self.collision_kirb_carap()
 
-            if self.unalive ==2:
-                self.reanimation()          
-                
+                if self.unalive ==2:
+                    self.reanimation()          
+                    
 
             for obj in self.objs:
                 GL.glUseProgram(obj.program)
@@ -103,7 +101,7 @@ class ViewerGL:
         # Vérifie que la variable existe
         if (loc == -1) :
             print("Pas de variable uniforme : translation_view")
-        # Modifie la variable pour le prograself.cam.transformation.rotation_euler[pyrr.euler.index().roll] -= 0.1mme courant
+        # Modifie la variable pour le programme courant
         translation = -self.cam.transformation.translation
         GL.glUniform4f(loc, translation.x, translation.y, translation.z, 0)
 
@@ -151,8 +149,6 @@ class ViewerGL:
 
             if glfw.KEY_SPACE in self.touch and self.touch[glfw.KEY_SPACE] > 0 :
                 global var_saut
-                posy = self.objs[0].transformation.translation.y
-                posy_sol = self.objs[1].transformation.translation.y
                 if var_saut == 0:
                     var_saut = 500
 
@@ -199,8 +195,6 @@ class ViewerGL:
         posxlakitu = self.objs[self.lakitu_init].transformation.translation.x
         posylakitu = self.objs[self.lakitu_init].transformation.translation.y
         poszlakitu = self.objs[self.lakitu_init].transformation.translation.z
-        
-        print(round(posxlakitu,3),round(posx,3),round(posylakitu,3),round(posy,3),round(poszlakitu,3),round(posz,3))
 
         if posylakitu <= -59:
             self.objs[self.lakitu_init].transformation.translation += \
@@ -258,6 +252,7 @@ class ViewerGL:
             self.objs[self.lakitu_init].transformation.translation += \
                 pyrr.matrix33.apply_to_vector(pyrr.matrix33.create_from_eulers(self.objs[self.lakitu_init].transformation.rotation_euler), pyrr.Vector3([1000,1000,1000]))
             self.lakitu_init +=1
+            self.pdv -= 1
 
 
     def collision_sol(self):
@@ -327,3 +322,8 @@ class ViewerGL:
 
               
         print(self.hit,self.i_frame_on,self.pdv)
+        
+    def finito_pipo(self):
+        if self.pdv < 1:
+            self.unalive = 3
+            print("Finito pipo, il fallait être meilleur")

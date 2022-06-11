@@ -40,7 +40,7 @@ def main():
             viewer.add_object(o)
 
 
-    m =Mesh.load_obj('Lakitu.obj') #Les lakitu x10 (copie intélligente)
+    m =Mesh.load_obj('Lakitu.obj') #Les lakitu (copie intélligente)
     m.normalize()
     m.apply_matrix(pyrr.matrix44.create_from_scale([3, 3, 3, 1]))
     texture = glutils.load_texture('Tex_0002_0.png')
