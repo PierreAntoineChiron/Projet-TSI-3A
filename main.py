@@ -65,6 +65,18 @@ def main():
         tr.translation.y = -np.amin(m.vertices, axis=0)[1]
         tr.translation.z = -15
         tr.rotation_center.z = 0.2
+
+    pv=5
+    niveau = 1
+    vao = Text.initalize_geometry()
+    texture = glutils.load_texture('fontB.jpg')
+    o = Text(str(niveau), np.array([-0.5, -0.2], np.float32), np.array([0.5, 0.3], np.float32), vao, 2, programGUI_id, texture)
+    viewer.add_object(o)
+
+    vao = Text.initalize_geometry()
+    texture = glutils.load_texture('fontB.jpg')
+    o = Text(str(pv), np.array([-0.8, 0.3], np.float32), np.array([0.8, 0.8], np.float32), vao, 2, programGUI_id, texture)
+    viewer.add_object(o)
     
     viewer.run()
 

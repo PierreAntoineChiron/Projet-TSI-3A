@@ -45,7 +45,9 @@ class ViewerGL:
         
         self.i_frame_on = True
         self.hit = False
-        self.pdv = 10
+        self.pdv = 5
+        self.temps = 30
+        self.niveau2 = 1
 
     def run(self):
         # boucle d'affichage
@@ -54,8 +56,9 @@ class ViewerGL:
             GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
 
             self.finito_pipo()
-
+            self.niveau()
             if self.unalive != 3:
+                self.affichage_vie()
                 self.update_key()
 
                 if self.unalive !=2:
@@ -166,7 +169,7 @@ class ViewerGL:
 
         if var_saut !=0:
             dt = current_time - last_time
-            acceleration = var_saut - 100
+            acceleration = var_saut - 300
             vitesse = 5 + acceleration * dt
             pos = vitesse * dt
             self.objs[0].transformation.translation += \
@@ -175,7 +178,7 @@ class ViewerGL:
             if var_saut == 0 :
                 var_saut = -1
 
-    def gravity(self): #pas le film
+    def gravity(self): # pas le film
         posx = self.objs[0].transformation.translation.x
         posy = self.objs[0].transformation.translation.y
         posz = self.objs[0].transformation.translation.z
@@ -271,10 +274,10 @@ class ViewerGL:
                 var_saut = 0
 
     def mvt_carapace(self):
-        for k in range(20,len(self.objs)):
-            if len(self.carap_dx) < len(self.objs):
+        for k in range(20,len(self.objs)-2):
+            if len(self.carap_dx) < len(self.objs)-2:
                 self.carap_dx.append(0.2 + 0.5*random.random())
-            if len(self.carap_dz) < len(self.objs):
+            if len(self.carap_dz) < len(self.objs)-2:
                 self.carap_dz.append(0.2 + 0.5*random.random())
 
             posx_carap = self.objs[k].transformation.translation.x
@@ -298,7 +301,7 @@ class ViewerGL:
         rayon_kirb = 1.9
         rayon_carap = 1.7
         
-        for k in range(20,len(self.objs)):
+        for k in range(20,len(self.objs)-2):
             posx_carap = self.objs[k].transformation.translation.x
             posy_carap = self.objs[k].transformation.translation.y
             posz_carap = self.objs[k].transformation.translation.z
@@ -321,9 +324,21 @@ class ViewerGL:
                 self.hit = False
 
               
-        print(self.hit,self.i_frame_on,self.pdv)
+        #print(self.hit,self.i_frame_on,self.pdv)
         
     def finito_pipo(self):
-        if self.pdv < 1:
+        if self.pdv < 1 or self.lakitu_init==20:
             self.unalive = 3
-            print("Finito pipo, il fallait être meilleur")
+            self.objs[len(self.objs)-1].value = "Perdu!"
+
+    def affichage_vie(self) :
+        self.objs[len(self.objs)-1].value = str(self.pdv)
+
+    def niveau(self):
+        if glfw.get_time() > self.temps :
+            self.temps += 30
+            for i in range(len(self.carap_dx)):
+                self.carap_dx[i]+=0.5
+            self.niveau2 +=1
+            self.pdv = 5
+            self.objs[len(self.objs)-2].value = str(self.niveau2)
