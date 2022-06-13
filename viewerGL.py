@@ -56,8 +56,9 @@ class ViewerGL:
             # nettoyage de la fenêtre : fond et profondeur
             GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
 
-            self.finito_pipo()
+            self.finito_pipo()          #Selon la valeur de self.unalive, plusieurs fonction sont activées/désactivées
             self.niveau()
+            
             if self.unalive != 3:
                 self.affichage_vie()
                 self.update_key()
@@ -153,12 +154,12 @@ class ViewerGL:
             if glfw.KEY_L in self.touch and self.touch[glfw.KEY_L] > 0:
                 self.cam.transformation.rotation_euler[pyrr.euler.index().yaw] += 0.1
 
-            if glfw.KEY_SPACE in self.touch and self.touch[glfw.KEY_SPACE] > 0 :
+            if glfw.KEY_SPACE in self.touch and self.touch[glfw.KEY_SPACE] > 0 : #Crée une impulsion
                 global var_saut
                 if var_saut == 0:
                     var_saut = 500
 
-        if glfw.KEY_Y in self.touch :
+        if glfw.KEY_Y in self.touch : #La première fois qu'un appuie sur Y est aussi la dernière car celle ci bloque la camera
             self.cam.transformation.rotation_euler = self.objs[0].transformation.rotation_euler.copy() 
             self.cam.transformation.rotation_euler[pyrr.euler.index().yaw] += np.pi
             self.cam.transformation.rotation_center = self.objs[0].transformation.translation + self.objs[0].transformation.rotation_center
@@ -171,7 +172,7 @@ class ViewerGL:
         current_time = glfw.get_time()
 
         if var_saut !=0: # tant que la variable var_saut est différente de 0, un saut est en cours d'éxécution
-            dt = current_time - last_time
+            dt = current_time - last_time       #3 lignes pour une approximation des forces de Newton
             acceleration = var_saut - 300
             vitesse = 5 + acceleration * dt
             pos = vitesse * dt
@@ -194,15 +195,15 @@ class ViewerGL:
             self.unalive =2
 
     def reanimation(self):
-        posx = self.objs[0].transformation.translation.x
+        posx = self.objs[0].transformation.translation.x #Coordonnées de Kirby
         posy = self.objs[0].transformation.translation.y
         posz = self.objs[0].transformation.translation.z
 
-        posxlakitu = self.objs[self.lakitu_init].transformation.translation.x
+        posxlakitu = self.objs[self.lakitu_init].transformation.translation.x #Coordonnées de Lakitu
         posylakitu = self.objs[self.lakitu_init].transformation.translation.y
         poszlakitu = self.objs[self.lakitu_init].transformation.translation.z
 
-        if posylakitu <= -59:
+        if posylakitu <= -59:  #Pour tous les différents mouvements du lakitu (hormis vertical), il est nécessaire de le "tourner" et donc de tourner sa camera
             self.objs[self.lakitu_init].transformation.translation += \
                 pyrr.matrix33.apply_to_vector(pyrr.matrix33.create_from_eulers(self.objs[self.lakitu_init].transformation.rotation_euler), pyrr.Vector3([posx, 64 + posy, 8 + posz]))
 
@@ -263,14 +264,14 @@ class ViewerGL:
 
     def collision_sol(self):
         global var_saut
-        posx = self.objs[0].transformation.translation.x
+        posx = self.objs[0].transformation.translation.x #Coordonnées de Kirby
         posy = self.objs[0].transformation.translation.y
         posz = self.objs[0].transformation.translation.z
 
         posy_sol = self.objs[1].transformation.translation.y
 
         if posx >= -75 and posx <= 75 and posz >= -75 and posz <= 75:
-            if posy - 1.905898094177246 < posy_sol:
+            if posy - 1.905898094177246 < posy_sol:             #Le 1.905... est la point central du kirby, ses pieds sont donc plus bas de tant
                 self.objs[0].transformation.translation += \
                     pyrr.matrix33.apply_to_vector(pyrr.matrix33.create_from_eulers(self.objs[0].transformation.rotation_euler), pyrr.Vector3([0, 0.024, 0]))
 
@@ -339,7 +340,7 @@ class ViewerGL:
     def niveau(self):
         if glfw.get_time() > self.temps : #Durée d'un niveau
             self.temps += 30
-            for i in range(len(self.carap_dx)):  #Augmente la vitesse de chaque carapaces de 0.25 dans les axes x et z
+            for i in range(len(self.carap_dx)):  #Augmente la vitesse des carapaces de 0.25 dans les axes x et z
                 if self.carap_dx[i] >= 0 :
                     self.carap_dx[i]+=0.25
                 if self.carap_dz[i] >= 0 :
@@ -350,7 +351,7 @@ class ViewerGL:
                     self.carap_dz[i]-=0.25     
             self.niveau2 +=1
             
-            if self.niveau2 >=4 :
+            if self.niveau2 >=4 :               #Augmente la vitesse de la carapace bleue
                 if self.carap_bleue[0]>0 :
                     self.carap_bleue[0]+=0.25
                 if self.carap_bleue[0]<0 :
@@ -379,7 +380,7 @@ class ViewerGL:
                 posy_carap = self.objs[-3].transformation.translation.y
                 posz_carap = self.objs[-3].transformation.translation.z
 
-                if posx_carap > 75 or posx_carap < -75:         #Rebondit sur les bords ET le hciel
+                if posx_carap > 75 or posx_carap < -75:         #Rebondit sur les bords ET le ciel
                     self.carap_bleue[0] = -self.carap_bleue[0]
                 if posz_carap > 75 or posz_carap < -75:
                     self.carap_bleue[2] = -self.carap_bleue[2]
