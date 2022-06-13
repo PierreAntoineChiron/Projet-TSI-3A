@@ -70,12 +70,12 @@ def main():
     niveau = 1
     vao = Text.initalize_geometry()
     texture = glutils.load_texture('fontB.jpg')
-    o = Text(str(niveau), np.array([-0.5, -0.2], np.float32), np.array([0.5, 0.3], np.float32), vao, 2, programGUI_id, texture)
+    o = Text(str(niveau), np.array([-1,0.5], np.float32), np.array([-0.5,1], np.float32), vao, 2, programGUI_id, texture)
     viewer.add_object(o)
 
     vao = Text.initalize_geometry()
     texture = glutils.load_texture('fontB.jpg')
-    o = Text(str(pv), np.array([-0.8, 0.3], np.float32), np.array([0.8, 0.8], np.float32), vao, 2, programGUI_id, texture)
+    o = Text(str(pv), np.array([0.5, 0.5], np.float32), np.array([1,1], np.float32), vao, 2, programGUI_id, texture)
     viewer.add_object(o)
     
     viewer.run()
