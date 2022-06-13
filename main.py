@@ -66,6 +66,17 @@ def main():
         tr.translation.z = -15
         tr.rotation_center.z = 0.2
 
+    m = Mesh.load_obj('BlueShell.obj')
+    m.normalize()
+    m.apply_matrix(pyrr.matrix44.create_from_scale([2, 2, 2, 1]))
+    tr = Transformation3D()
+    tr.translation.y = 10
+    tr.translation.z = -5
+    tr.rotation_center.z = 0.2
+    texture = glutils.load_texture('itemTogezo.png')
+    o = Object3D(m.load_to_gpu(), m.get_nb_triangles(), program3d_id, texture, tr)
+    viewer.add_object(o)
+
     pv=5
     niveau = 1
     vao = Text.initalize_geometry()

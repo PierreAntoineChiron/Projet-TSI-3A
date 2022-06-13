@@ -1,0 +1,10 @@
+[2.79]
+
+Select your Model
+
+1. Go to "Texture" (the checkerboard)
+
+2. Scroll down to "Image Mapping"
+
+3. Check Mirror (X and Y)
+

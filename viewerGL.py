@@ -42,6 +42,7 @@ class ViewerGL:
         self.lakitu_init = 10
         self.carap_dx = []
         self.carap_dz = []
+        self.carap_bleue = []
         
         self.i_frame_on = True
         self.hit = False
@@ -64,6 +65,8 @@ class ViewerGL:
                 if self.unalive !=2:
                     self.gravity()
                     self.mvt_carapace()
+                    if self.niveau2 >= 3:
+                        self.mvt_carapace_bleue()
 
                     if self.unalive == 0:
                         self.collision_sol()
@@ -167,7 +170,7 @@ class ViewerGL:
         last_time = current_time
         current_time = glfw.get_time()
 
-        if var_saut !=0:
+        if var_saut !=0: # tant que la variable var_saut est différente de 0, un saut est en cours d'éxécution
             dt = current_time - last_time
             acceleration = var_saut - 300
             vitesse = 5 + acceleration * dt
@@ -274,16 +277,16 @@ class ViewerGL:
                 var_saut = 0
 
     def mvt_carapace(self):
-        for k in range(20,len(self.objs)-2):
-            if len(self.carap_dx) < len(self.objs)-2:
+        for k in range(20,len(self.objs)-3):
+            if len(self.carap_dx) < len(self.objs)-3:           #Attribution à chaque carapace d'une vitesse aléatoire entre -0.3 et 0.7 dans les axes x et z
                 self.carap_dx.append(0.2 + 0.5*random.random())
-            if len(self.carap_dz) < len(self.objs)-2:
+            if len(self.carap_dz) < len(self.objs)-3:
                 self.carap_dz.append(0.2 + 0.5*random.random())
 
             posx_carap = self.objs[k].transformation.translation.x
             posz_carap = self.objs[k].transformation.translation.z
 
-            if posx_carap > 75 or posx_carap < -75:
+            if posx_carap > 75 or posx_carap < -75:         #Rebondit sur les bords
                 self.carap_dx[k-20] = -self.carap_dx[k-20]
             if posz_carap > 75 or posz_carap < -75:
                 self.carap_dz[k-20] = -self.carap_dz[k-20]
@@ -295,36 +298,35 @@ class ViewerGL:
         last_time = current_time
         current_time = glfw.get_time()
         
-        posx = self.objs[0].transformation.translation.x
+        posx = self.objs[0].transformation.translation.x #Coordonnées Kirby
         posy = self.objs[0].transformation.translation.y
         posz = self.objs[0].transformation.translation.z
         rayon_kirb = 1.9
         rayon_carap = 1.7
         
         for k in range(20,len(self.objs)-2):
-            posx_carap = self.objs[k].transformation.translation.x
+            posx_carap = self.objs[k].transformation.translation.x  #Coordonnées carapaces
             posy_carap = self.objs[k].transformation.translation.y
             posz_carap = self.objs[k].transformation.translation.z
             
-            dist = np.sqrt((posx-posx_carap)**2 + (posy-posy_carap)**2 + (posz-posz_carap)**2)
+            dist = np.sqrt((posx-posx_carap)**2 + (posy-posy_carap)**2 + (posz-posz_carap)**2) #Distance entre les objets pour des sphères
         
             if self.i_frame_on:
-                if current_time - temps_touche > 25 * (current_time - last_time) * 5000:
+                if current_time - temps_touche > 25 * (current_time - last_time) * 5000: #Environ 25 images
                     self.i_frame_on = False
                 else:
                     pass
                 
-            elif (dist < rayon_kirb + rayon_carap) and (self.i_frame_on == False) :
+            elif (dist < rayon_kirb + rayon_carap) and (self.i_frame_on == False) : #peut etre touché dans ces conditions
                 self.hit = True
                 self.i_frame_on = True
-                temps_touche = glfw.get_time()
+                temps_touche = glfw.get_time() #On enregistre le temps auquel le joueur est touché, utile pour la période d'immunité
                 self.pdv -=1
                 
             else:
                 self.hit = False
 
-              
-        #print(self.hit,self.i_frame_on,self.pdv)
+            
         
     def finito_pipo(self):
         if self.pdv < 1 or self.lakitu_init==20:
@@ -335,10 +337,53 @@ class ViewerGL:
         self.objs[len(self.objs)-1].value = str(self.pdv)
 
     def niveau(self):
-        if glfw.get_time() > self.temps :
+        if glfw.get_time() > self.temps : #Durée d'un niveau
             self.temps += 30
-            for i in range(len(self.carap_dx)):
-                self.carap_dx[i]+=0.5
+            for i in range(len(self.carap_dx)):  #Augmente la vitesse de chaque carapaces de 0.25 dans les axes x et z
+                if self.carap_dx[i] >= 0 :
+                    self.carap_dx[i]+=0.25
+                if self.carap_dz[i] >= 0 :
+                    self.carap_dz[i]+=0.25  
+                if self.carap_dx[i] <= 0 :
+                    self.carap_dx[i]-=0.25
+                if self.carap_dz[i] <= 0 :
+                    self.carap_dz[i]-=0.25     
             self.niveau2 +=1
-            self.pdv = 5
+            
+            if self.niveau2 >=4 :
+                if self.carap_bleue[0]>0 :
+                    self.carap_bleue[0]+=0.25
+                if self.carap_bleue[0]<0 :
+                    self.carap_bleue[0]-=0.25
+
+                if self.carap_bleue[1]>0 :
+                    self.carap_bleue[1]+=0.25
+                if self.carap_bleue[1]<0 :
+                    self.carap_bleue[1]-=0.25
+
+                if self.carap_bleue[2]>0 :
+                    self.carap_bleue[2]+=0.25
+                if self.carap_bleue[2]<0 :
+                    self.carap_bleue[2]-=0.25
+            self.pdv = 5                # Remet les points de vie à 5
             self.objs[len(self.objs)-2].value = str(self.niveau2)
+
+
+    def mvt_carapace_bleue(self):
+                if len(self.carap_bleue) == 0:           #Attribution à la carapace bleue d'une vitesse aléatoire entre -0.3 et 0.7 dans les axes x,y et z
+                    self.carap_bleue.append(0.2 + 0.5*random.random()) #Vitesses en x
+                    self.carap_bleue.append(0.2 + 0.5*random.random()) #Vitesses en y
+                    self.carap_bleue.append(0.2 + 0.5*random.random()) #Vitesses en z
+
+                posx_carap = self.objs[-3].transformation.translation.x
+                posy_carap = self.objs[-3].transformation.translation.y
+                posz_carap = self.objs[-3].transformation.translation.z
+
+                if posx_carap > 75 or posx_carap < -75:         #Rebondit sur les bords ET le hciel
+                    self.carap_bleue[0] = -self.carap_bleue[0]
+                if posz_carap > 75 or posz_carap < -75:
+                    self.carap_bleue[2] = -self.carap_bleue[2]
+                if posy_carap < 0.5 or posy_carap > 10:
+                    self.carap_bleue[1] = -self.carap_bleue[1]
+                self.objs[-3].transformation.translation += \
+                            pyrr.matrix33.apply_to_vector(pyrr.matrix33.create_from_eulers(self.objs[-3].transformation.rotation_euler), pyrr.Vector3([self.carap_bleue[0],self.carap_bleue[1] , self.carap_bleue[2]]))
